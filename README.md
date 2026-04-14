@@ -129,5 +129,5 @@ MIT License
 
 ## 💡 Author
 
-Mahmud Mahi -
+Mahmud Mahi - [Email me](mailto:mahmudurahmanmahi26@gmail.com)
 
