@@ -1,82 +1,158 @@
-# wallpaperx
+# WallpaperX
 
-A smart wallpaper rotator for XFCE that automatically changes wallpapers across multiple workspaces and monitors without repeating images.
+WallpaperX is a XFCE wallpaper rotator for laptop users. It changes the wallpapers of your laptop display workspaces, avoids repeats until the image pool is exhausted, and lets users choose the wallpaper folder from the command line instead of editing the script.
 
-## ✨ Features
+This project includes:
 
-* 🖥️ Multi-monitor support (HDMI, eDP, VGA, etc.)
-* 🧩 Per-workspace wallpaper control
-* 🔁 No-repeat algorithm (cycles through all wallpapers before repeating)
-* ⚡ Fast and lightweight
-* 🛠️ Works with XFCE (`xfconf-query`)
-* ⏱️ Automation support via systemd timers
+- the Python source file `wallpaperx.py`
+- a compiled executable named `wallpaperx`
+- a sample wallpaper folder named `Wallpapers/`
 
----
+## Features
 
-## 📸 How It Works
+- Rotates wallpapers for XFCE workspaces on the built-in laptop display
+- Prefers `monitoreDP`, then falls back to `monitorLVDS` or `monitorDSI`
+- Accepts wallpaper directory from the command line with `--dir`
+- Avoids repeating images until all available images have been used
+- Saves wallpaper history in `~/.cache/wallpaperx_history.txt`
+- Works well with `systemd --user` timers
 
-* Detects all XFCE workspace wallpaper paths
-* Selects unused wallpapers randomly
-* Applies different wallpapers to each workspace
-* Stores history to prevent repetition
-* Resets automatically when all images are used
+## How It Works
 
----
+WallpaperX asks XFCE for the available wallpaper property paths using `xfconf-query`.
 
-## 📦 Requirements
+It then:
 
-* XFCE Desktop Environment
-* `xfconf-query`
-* Python 3 (if running script directly)
+- finds the workspace wallpaper paths for the laptop display
+- reads images from the directory you provide
+- skips images already used in previous runs
+- resets the history automatically when all images have been used
+- assigns one image per workspace
+- reloads `xfdesktop` so the change appears immediately
 
----
+## Requirements
 
-## 🚀 Installation
+- Linux with XFCE desktop
+- `xfconf-query`
+- `xfdesktop`
+- Python 3
 
-### Option 1: Run Python script
+## Before You Run It
+
+Make sure these are already set up on the user's system:
+
+- XFCE is managing the desktop background
+- the laptop display appears in XFCE wallpaper settings as `monitoreDP`, `monitorLVDS`, or `monitorDSI`
+- the workspaces already exist in XFCE
+- the wallpaper directory contains supported image files
+
+Supported image formats:
+
+- `.jpg`
+- `.jpeg`
+- `.png`
+- `.bmp`
+- `.webp`
+
+## Usage
+
+Clone the project and run it with a wallpaper directory:
 
 ```bash
-git clone https://github.com/yourusername/wallpaperx.git
+git clone https://github.com/Mahmud-Mahi/wallpaperx.git
 cd wallpaperx
-python3 wallpaper.py
+python3 wallpaperx.py --dir ~/Pictures/Wallpapers
 ```
 
-### Option 2: Use compiled binary (PyInstaller)
-coming soon
+If you want to use the included sample wallpaper folder:
+
 ```bash
-chmod +x wallpaperx
-./wallpaperx
+python3 wallpaperx.py --dir ./Wallpapers
 ```
 
----
+Short form:
 
-## ⚙️ Configuration
-
-Edit the script:
-
-```python
-dir_path = "/home/your-username/Pictures/Wallpapers"
+```bash
+python3 wallpaperx.py -d ./Wallpapers
 ```
 
----
+If `--dir` is not provided, WallpaperX uses:
 
-## 🧠 Automation (systemd timer)
+```text
+~/Pictures/Wallpapers
+```
 
-Create a user service and timer to run daily:
+## Compiled Executable
+
+If you do not want to run the Python file directly, you can use the compiled executable included in the project:
+
+```bash
+chmod +x ./wallpaperx
+./wallpaperx --dir ./Wallpapers
+```
+
+You can also point it to any other wallpaper folder:
+
+```bash
+./wallpaperx --dir ~/Pictures/Wallpapers
+```
+
+## Monitor Selection
+
+WallpaperX is intentionally focused on the laptop's built-in display.
+
+The script checks monitor names in this order:
+
+1. `monitoreDP`
+2. `monitorLVDS`
+3. `monitorDSI`
+
+As soon as one match is found, that monitor's workspace wallpaper paths are used. External displays are ignored.
+
+## Example Output
+
+```text
+/backdrop/screen0/monitoreDP/workspace0/last-image -> /home/user/Pictures/Wallpapers/a.jpg
+/backdrop/screen0/monitoreDP/workspace1/last-image -> /home/user/Pictures/Wallpapers/b.jpg
+/backdrop/screen0/monitoreDP/workspace2/last-image -> /home/user/Pictures/Wallpapers/c.jpg
+```
+
+## Automation With systemd
+
+You can run WallpaperX automatically with a user timer.
+
+Create `~/.config/systemd/user/wallpaperx.service`:
 
 ```ini
-# ~/.config/systemd/user/wallpaper.service
 [Unit]
-Description=WallpaperX Service
+Description=WallpaperX
 
 [Service]
-ExecStart=/path/to/wallpaperx
+Type=oneshot
+ExecStart=/usr/bin/python3 /path/to/wallpaperx.py --dir /path/to/wallpapers
 Environment=DISPLAY=:0
-Environment=XAUTHORITY=/home/your-username/.Xauthority
+Environment=XAUTHORITY=%h/.Xauthority
 ```
 
+If you want to use the compiled executable instead, use:
+
 ```ini
-# ~/.config/systemd/user/wallpaper.timer
+[Unit]
+Description=WallpaperX
+
+[Service]
+Type=oneshot
+ExecStart=/path/to/wallpaperx --dir /path/to/wallpapers
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=%h/.Xauthority
+```
+
+Create `~/.config/systemd/user/wallpaperx.timer`:
+
+```ini
+[Unit]
+Description=Run WallpaperX daily
+
 [Timer]
 OnCalendar=*-*-* 07:00:00
 Persistent=true
@@ -89,45 +165,31 @@ Enable it:
 
 ```bash
 systemctl --user daemon-reload
-systemctl --user enable wallpaper.timer
-systemctl --user start wallpaper.timer
+systemctl --user enable --now wallpaperx.timer
 ```
 
----
+## Project Files
 
-## 📁 Project Structure
-
-```
+```text
 wallpaperx/
-├── wallpaper.py
+├── Wallpapers/
+├── wallpaperx
+├── wallpaperx.py
 ├── README.md
-└── .gitignore
+└── LICENSE
 ```
 
----
+## Notes
 
-## 🔮 Future Improvements
+- This project targets XFCE only
+- This version is designed for laptop internal displays, not full multi-monitor wallpaper rotation
+- Wallpaper history is shared across runs through `~/.cache/wallpaperx_history.txt`
 
-* CLI options (random / cycle modes)
-* Per-workspace themes
-* GUI interface
-* Packaging as `.deb`
-
----
-
-## 🤝 Contributing
-
-Pull requests are welcome. Feel free to suggest improvements or new features.
-
----
-
-## 📜 License
+## License
 
 MIT License
 
----
+## Author
 
-## 💡 Author
-
-Mahmud Mahi - [Email me](mailto:mahmudurahmanmahi26@gmail.com)
-
+Mahmud Mahi  
+Email: [mahmudurahmanmahi26@gmail.com](mailto:mahmudurahmanmahi26@gmail.com)
