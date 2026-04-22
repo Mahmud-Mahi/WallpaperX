@@ -20,10 +20,10 @@ Workspace--1
 <img width="1920" height="1080" alt="preview1" src="https://github.com/user-attachments/assets/0006be92-67ee-48bb-807a-e23b282e5d50" />
 
 Workspace--2
-<img width="1920" height="1080" alt="Preview2" src="https://github.com/user-attachments/assets/dd3e7cc6-cbf9-4412-9d39-0c3a660662d5" />
+<img width="1920" height="1080" alt="Preview" src="https://github.com/user-attachments/assets/c258dbe7-9a14-410c-a2b7-c97c1ff12b74" />
 
 Workspace--3
-<img width="1920" height="1080" alt="preview3" src="https://github.com/user-attachments/assets/fefb83f3-933b-45bc-9e18-86a1ab896c53" />
+<img width="1920" height="1080" alt="demo" src="https://github.com/user-attachments/assets/8d018a86-5dc1-48b5-ace3-b7d15757fd2c" />
 
 ---
 
