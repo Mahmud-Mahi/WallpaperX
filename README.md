@@ -16,7 +16,10 @@ WallpaperX is a smart wallpaper changer for XFCE that sets different wallpapers 
 
 ## 📸 Preview
 
-*Add a screenshot here showing different wallpapers on workspaces*
+<img width="1920" height="1080" alt="preview1" src="https://github.com/user-attachments/assets/ce31d1e4-fd76-445b-b590-dc098b0bd21d" />
+<img width="1920" height="1080" alt="Preview" src="https://github.com/user-attachments/assets/4ba6366d-2f58-488d-9de9-34f40e2c922e" />
+
+
 
 ---
 
