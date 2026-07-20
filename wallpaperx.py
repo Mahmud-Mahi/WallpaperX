@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 DEFAULT_DIR = Path("~/Pictures/Wallpapers").expanduser()
-HISTORY_PATH = Path("~/.cache/wallpaperx_history.txt").expanduser()
+HISTORY_PATH = Path("~/.config/wallpaperx_history.txt").expanduser()
 VALID_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp", ".webp")
 LAPTOP_MONITOR_HINTS = ("monitoredp", "monitorlvds", "monitordsi")
 
@@ -132,7 +132,12 @@ def main():
             history.append(image_name)
 
     save_history(HISTORY_PATH, history)
-    subprocess.run(["xfdesktop", "--reload"], check=False)
+
+    if subprocess.run(["pgrep", "-x", "xfdesktop"], 
+                      stdout=subprocess.DEVNULL).returncode != 0:
+        subprocess.Popen(["xfdesktop"])
+    else:
+        subprocess.run(["xfdesktop", "--reload"], check=False)
 
 
 if __name__ == "__main__":
